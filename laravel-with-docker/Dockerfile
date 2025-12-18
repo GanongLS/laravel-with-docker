@@ -1,4 +1,3 @@
-# Sebelum diutak atik chat GPT
 
 FROM php:8.4-fpm
 
@@ -47,9 +46,7 @@ RUN npm install
 RUN npm run build
 
 # Set ownership and permissions
-RUN mkdir -p /var/www/html/storage/logs \
-    && chown -R www-data:www-data /var/www/html/storage \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/
 
 # Expose PHP-FPM port
 EXPOSE 9000

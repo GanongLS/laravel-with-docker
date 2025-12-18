@@ -6,7 +6,6 @@ services:
     restart: unless-stopped
     volumes:
       - app-code:/var/www/html
-      - ./laravel-with-docker/.env:/var/www/html/.env
     networks:
       - docker-network
     ports:
@@ -21,7 +20,6 @@ services:
     restart: unless-stopped
     volumes:
       - app-code:/var/www/html
-      - ./laravel-with-docker/.env:/var/www/html/.env
     networks:
       - docker-network
     depends_on:
