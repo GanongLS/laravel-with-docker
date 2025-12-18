@@ -1,6 +1,6 @@
 FROM php:8.4-fpm
 
-# Update package list and install dependencies
+# Update package list and install PHP + system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpng-dev \
@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
     libmcrypt-dev \
     libonig-dev \
     libpq-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
@@ -27,18 +28,29 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
 # Install Composer
 COPY --from=composer/composer:latest-bin /composer /usr/bin/composer
 
-# Copy existing application directory contents
+# Install Node.js & npm
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
+# Copy PHP application code
 COPY . /var/www/html/
 
-# dari chatGPT install composer dependencies
+# Copy Composer files and install PHP dependencies
 COPY composer.json composer.lock /var/www/html/
 RUN composer install --no-dev --optimize-autoloader
 
-# Set ownership and permissions for the /var/www/html directory to www-data
+# Copy Node.js dependency files and install Node modules
+COPY package*.json /var/www/html/
+RUN npm install
+
+# Set ownership and permissions
 RUN chown -R www-data:www-data /var/www/html/
 
+# Switch to non-root user
 USER www-data
 
+# Expose PHP-FPM port
 EXPOSE 9000
 
+# Start PHP-FPM
 CMD ["php-fpm"]
