@@ -4,8 +4,8 @@ services:
       context: ./laravel-with-docker
       dockerfile: Dockerfile
     restart: unless-stopped
-    volumes:
-      - ./laravel-with-docker:/var/www/html
+    # volumes: # ga boleh ada mount volume di sini, biar ga kena overwrite code yg udah di copy pas build
+    #   - ./laravel-with-docker:/var/www/html
     networks:
         - docker-network
     ports:
@@ -18,8 +18,8 @@ services:
       context: ./laravel-with-docker
       dockerfile: Dockerfile
     restart: unless-stopped
-    volumes:
-      - ./laravel-with-docker:/var/www/html
+    # volumes: # ga boleh ada mount volume di sini, biar ga kena overwrite code yg udah di copy pas build
+    #   - ./laravel-with-docker:/var/www/html
     networks:
       - docker-network
     depends_on:

@@ -30,6 +30,10 @@ COPY --from=composer/composer:latest-bin /composer /usr/bin/composer
 # Copy existing application directory contents
 COPY . /var/www/html/
 
+# dari chatGPT install composer dependencies
+COPY composer.json composer.lock /var/www/html/
+RUN composer install --no-dev --optimize-autoloader
+
 # Set ownership and permissions for the /var/www/html directory to www-data
 RUN chown -R www-data:www-data /var/www/html/
 
