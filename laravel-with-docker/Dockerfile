@@ -47,10 +47,9 @@ RUN npm install
 RUN npm run build
 
 # Set ownership and permissions
-RUN chown -R www-data:www-data /var/www/html/
-
-# Switch to non-root user
-# USER www-data
+RUN mkdir -p /var/www/html/storage/logs \
+    && chown -R www-data:www-data /var/www/html/storage \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Expose PHP-FPM port
 EXPOSE 9000
