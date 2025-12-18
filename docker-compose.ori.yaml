@@ -1,12 +1,13 @@
+# sebelum diutak atik chat GPT
+
 services:
   app:
     build:
       context: ./laravel-with-docker
       dockerfile: Dockerfile
     restart: unless-stopped
-    volumes:
-      - app-code:/var/www/html
-      - ./laravel-with-docker/.env:/var/www/html/.env
+    # volumes: # ga boleh ada mount volume di sini, biar ga kena overwrite code yg udah di copy pas build
+    #   - ./laravel-with-docker:/var/www/html
     networks:
       - docker-network
     ports:
@@ -19,9 +20,8 @@ services:
       context: ./laravel-with-docker
       dockerfile: Dockerfile
     restart: unless-stopped
-    volumes:
-      - app-code:/var/www/html
-      - ./laravel-with-docker/.env:/var/www/html/.env
+    # volumes: # ga boleh ada mount volume di sini, biar ga kena overwrite code yg udah di copy pas build
+    #   - ./laravel-with-docker:/var/www/html
     networks:
       - docker-network
     depends_on:
@@ -35,7 +35,7 @@ services:
       - 443:443
     restart: unless-stopped
     volumes:
-      - app-code:/var/www/html
+      - ./laravel-with-docker:/var/www/html
       - ./Caddyfile:/etc/caddy/Caddyfile
     networks:
       - docker-network
@@ -44,6 +44,7 @@ services:
 
   db:
     image: bitnami/postgresql:latest
+    platform: linux/amd64
     ports:
       - 5432:5432
     restart: always
@@ -58,6 +59,7 @@ services:
 
   redis:
     image: bitnami/redis:latest
+    platform: linux/amd64
     ports:
       - 6379:6379
     restart: always
@@ -73,7 +75,6 @@ services:
 volumes:
   db-data:
   redis-data:
-  app-code:
 
 networks:
   docker-network:
