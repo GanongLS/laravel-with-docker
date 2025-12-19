@@ -1,3 +1,4 @@
+# Sebelum diutak atik chat GPT
 
 FROM php:8.4-fpm
 
@@ -47,6 +48,9 @@ RUN npm run build
 
 # Set ownership and permissions
 RUN chown -R www-data:www-data /var/www/html/
+
+# Switch to non-root user
+USER www-data
 
 # Expose PHP-FPM port
 EXPOSE 9000

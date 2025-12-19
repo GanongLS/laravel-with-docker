@@ -2,77 +2,87 @@ services:
   app:
     build:
       context: ./laravel-with-docker
-      dockerfile: Dockerfile
-    restart: unless-stopped
+      dockerfile: Dockerfile.dev
     volumes:
-      - app-code:/var/www/html
-    networks:
-      - docker-network
+      - ./laravel-with-docker:/var/www/html
     ports:
       - 9000:9000
     depends_on:
       - db
-
-  queue-worker:
-    build:
-      context: ./laravel-with-docker
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    volumes:
-      - app-code:/var/www/html
+      - redis
     networks:
       - docker-network
+
+  vite:
+    build:
+      context: ./laravel-with-docker
+      dockerfile: Dockerfile.dev
+    command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./laravel-with-docker:/var/www/html
+    ports:
+      - 5173:5173
+    depends_on:
+      - app
+    networks:
+      - docker-network
+
+  queue:
+    build:
+      context: ./laravel-with-docker
+      dockerfile: Dockerfile.dev
+    command: php artisan queue:work
+    volumes:
+      - ./laravel-with-docker:/var/www/html
     depends_on:
       - db
-    command: php artisan queue:work
-
+      - redis
+    networks:
+      - docker-network
+      
   caddy:
     image: caddy:latest
     ports:
       - 80:80
       - 443:443
-    restart: unless-stopped
     volumes:
-      - app-code:/var/www/html
       - ./Caddyfile:/etc/caddy/Caddyfile
-    networks:
-      - docker-network
+      - ./laravel-with-docker/public:/var/www/html/public
     depends_on:
       - app
+    networks:
+      - docker-network
 
   db:
     image: bitnami/postgresql:latest
-    ports:
-      - 5432:5432
-    restart: always
-    volumes:
-      - db-data:/bitnami/postgresql
     environment:
       - POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE}
       - POSTGRESQL_USERNAME=${POSTGRESQL_USERNAME}
       - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+    volumes:
+      - db-data:/bitnami/postgresql
+    ports:
+      - 5432:5432
     networks:
       - docker-network
 
   redis:
     image: bitnami/redis:latest
-    ports:
-      - 6379:6379
-    restart: always
-    volumes:
-      - redis-data:/bitnami/redis/data
     environment:
       - ALLOW_EMPTY_PASSWORD=no
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-data:/bitnami/redis/data
     networks:
       - docker-network
-
-volumes:
-  db-data:
-  redis-data:
-  app-code:
 
 networks:
   docker-network:
     driver: bridge
+
+volumes:
+  db-data:
+  redis-data:

@@ -1,0 +1,23 @@
+FROM php:8.4-fpm
+
+# System deps
+RUN apt-get update && apt-get install -y \
+    git curl unzip \
+    libpng-dev libjpeg-dev libwebp-dev libfreetype6-dev \
+    libzip-dev libonig-dev libpq-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install \
+        gd pdo pdo_pgsql mbstring zip exif pcntl bcmath opcache \
+    && rm -rf /var/lib/apt/lists/*
+
+# Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Node (dev but still needed for Vite)
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
+    && apt-get install -y nodejs
+
+WORKDIR /var/www/html
+
+EXPOSE 9000
+CMD ["php-fpm"]
