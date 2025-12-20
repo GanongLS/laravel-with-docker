@@ -10,5 +10,6 @@ class BlogPost extends Model
     'slug',
     'title',
     'content',
+    'status',
   ];
 }

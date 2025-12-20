@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\PublicBlogController;
-
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminBlogController;
 
 
 Route::get('/', function () {
@@ -78,5 +79,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     return Inertia::render('dashboard');
   })->name('dashboard');
 });
+
+
+Route::middleware(['auth', 'admin'])
+  ->prefix('admin')
+  ->group(function () {
+    Route::get('/', [AdminDashboardController::class, 'index'])
+      ->name('admin.dashboard');
+
+    Route::get('/blog', [AdminBlogController::class, 'index'])
+      ->name('admin.blog.index');
+
+    Route::get('/blog/create', [AdminBlogController::class, 'create'])
+      ->name('admin.blog.create');
+
+    Route::post('/blog', [AdminBlogController::class, 'store'])
+      ->name('admin.blog.store');
+  });
 
 require __DIR__ . '/settings.php';
