@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
+use App\Http\Controllers\PublicBlogController;
 
 
 
@@ -52,15 +53,7 @@ Route::get('/contact', function () {
   return Inertia::render('contact');
 })->name('contact');
 
-Route::get('/blog', function () {
-  return Inertia::render('blog/index');
-})->name('blog.index');
 
-Route::get('/blog/{slug}', function ($slug) {
-  return Inertia::render('blog/show', [
-    'slug' => $slug,
-  ]);
-})->name('blog.show');
 
 Route::get('/start', function () {
   return Inertia::render('start');
@@ -71,6 +64,14 @@ Route::get('/laravel', function () {
     'canRegister' => Features::enabled(Features::registration()),
   ]);
 })->name('laravel');
+
+Route::get('/blog', [PublicBlogController::class, 'index'])
+  ->name('blog.index');
+
+Route::get('/blog/{slug}', [PublicBlogController::class, 'show'])
+  ->name('blog.show');
+
+Route::get('/_test/blog/{slug}', [PublicBlogController::class, 'show']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
   Route::get('dashboard', function () {

@@ -43,7 +43,7 @@ services:
   db:
     image: bitnami/postgresql:latest
     ports:
-      - 5432:5432
+      - 127.0.0.1:5432:5432
     restart: always
     volumes:
       - db-data:/bitnami/postgresql
@@ -57,7 +57,7 @@ services:
   redis:
     image: bitnami/redis:latest
     ports:
-      - 6379:6379
+      - 127.0.0.1:6379:6379
     restart: always
     volumes:
       - redis-data:/bitnami/redis/data
